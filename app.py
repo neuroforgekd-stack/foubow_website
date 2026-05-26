@@ -1,21 +1,17 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from dotenv import load_dotenv
 import os
 import requests
 
 load_dotenv()
-app = Flask(__name__)
-CORS(app)  # 允许所有跨域请求
+app = Flask(__name__, static_folder='.', static_url_path='')
+CORS(app)
 
-# 基础配置
-COZE_URL = "https://api.coze.cn/v1/workflow/run"  # 使用非流式接口
+COZE_URL = "https://api.coze.cn/v1/workflow/run"
 TOKEN = os.getenv("COZE_TOKEN")
 APP_ID = os.getenv("COZE_APP_ID")
 
-# --------------------------
-# 登录接口
-# --------------------------
 @app.route("/api/coze/login", methods=["POST"])
 def login():
     data = request.json
@@ -25,7 +21,6 @@ def login():
     if not email or not password:
         return jsonify({"code": 0, "msg": "参数不完整"}), 400
 
-    # 调用 Coze 登录 API（非流式响应）
     try:
         resp = requests.post(
             COZE_URL,
@@ -56,9 +51,6 @@ def login():
     else:
         return jsonify({"code": 0, "msg": "邮箱或密码错误"})
 
-# --------------------------
-# 注册接口
-# --------------------------
 @app.route("/api/coze/register", methods=["POST"])
 def register():
     data = request.json
@@ -100,11 +92,14 @@ def register():
     else:
         return jsonify({"code": 0, "msg": "注册失败"})
 
+@app.route('/')
+def index():
+    return send_from_directory('.', 'index.html')
+
+@app.route('/<path:path>')
+def static_files(path):
+    return send_from_directory('.', path)
+
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=2300, debug=True)
-
-# 在文件末尾添加
-from vercel_wsgi import handle_wsgi
-
-def handler(request, **kwargs):
-    return handle_wsgi(app, request)
+    port = int(os.environ.get("PORT", 2300))
+    app.run(host="0.0.0.0", port=port, debug=False)
