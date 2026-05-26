@@ -102,3 +102,9 @@ def register():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=2300, debug=True)
+
+# 在文件末尾添加
+from vercel_wsgi import handle_wsgi
+
+def handler(request, **kwargs):
+    return handle_wsgi(app, request)
