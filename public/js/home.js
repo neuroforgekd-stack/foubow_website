@@ -1,5 +1,5 @@
-// 卡片hover动画加强
 document.addEventListener('DOMContentLoaded', () => {
+  // 卡片悬浮动画
   const cards = document.querySelectorAll('.glass-card');
   cards.forEach(card => {
     card.addEventListener('mouseenter', () => {
@@ -11,10 +11,4 @@ document.addEventListener('DOMContentLoaded', () => {
       card.style.boxShadow = '';
     });
   });
-
-  // 按钮跳转
-  const startBtn = document.querySelector('button:has(.material-symbols-outlined)');
-  if (startBtn) {
-    startBtn.addEventListener('click', () => goTo('register'));
-  }
 });
